@@ -1,5 +1,5 @@
 APP_NAME    := PageKey
-VERSION     := 1.1.1
+VERSION     := 1.1.2
 BUILD_DIR   := .build
 APP_BUNDLE  := $(BUILD_DIR)/$(APP_NAME).app
 BIN         := $(BUILD_DIR)/pagekey

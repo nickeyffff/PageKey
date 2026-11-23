@@ -13,7 +13,7 @@
 // 构建：make build（或 swiftc -O Sources/PageKey/main.swift -o build/pagekey）
 // 许可：MIT
 
-let PageKeyVersion = "1.1.1"
+let PageKeyVersion = "1.1.2"
 
 import Cocoa
 
@@ -146,7 +146,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             for item in statusItem.menu?.items ?? [] {
                 if item.isSeparatorItem { print("---"); continue }
                 let mark = item.state == .on ? "[x]" : "[ ]"
-                print("\(mark) \(item.title)\(item.isEnabled ? "" : "   (置灰)")")
+                let key = item.keyEquivalent.isEmpty ? "" : "   ⌘\(item.keyEquivalent.uppercased())"
+                print("\(mark) \(item.title)\(key)\(item.isEnabled ? "" : "   (置灰)")")
             }
             exit(0)
         }
@@ -261,7 +262,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.menu?.addItem(scope)
         statusItem.menu?.addItem(.separator())
         let hudToggle = NSMenuItem(title: "显示切换提示条",
-                                   action: #selector(toggleHUD), keyEquivalent: "h")
+                                   action: #selector(toggleHUD), keyEquivalent: "")
         hudToggle.state = hudEnabled ? .on : .off
         statusItem.menu?.addItem(hudToggle)
 
@@ -271,10 +272,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         toggle.isEnabled = hudEnabled          // 总开关关掉时，子选项置灰
         statusItem.menu?.addItem(toggle)
 
-        statusItem.menu?.addItem(NSMenuItem(title: "预览提示条", action: #selector(testHUD), keyEquivalent: "t"))
+        statusItem.menu?.addItem(NSMenuItem(title: "预览提示条", action: #selector(testHUD), keyEquivalent: ""))
         statusItem.menu?.addItem(NSMenuItem(title: "使用说明", action: #selector(showHelp), keyEquivalent: ""))
         statusItem.menu?.addItem(.separator())
-        statusItem.menu?.addItem(NSMenuItem(title: "退出 PageKey", action: #selector(quit), keyEquivalent: "q"))
+        statusItem.menu?.addItem(NSMenuItem(title: "退出 PageKey", action: #selector(quit), keyEquivalent: ""))
         for item in statusItem.menu?.items ?? [] { item.target = self }
     }
 
