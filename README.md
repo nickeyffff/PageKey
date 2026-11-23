@@ -107,7 +107,8 @@ make install
 
 - **启动**：弹说明框，列出当前生效范围与键位映射
 - **切到目标 App**：右上角浮出提示条「PageKey 已启用 · Windows App」，2.6 秒淡出
-- **菜单栏 ⌨**：查看状态（已启用 / 待命）、勾选「切走时也提示」、手动显示提示条、退出
+- **菜单栏 ⌨**：查看状态（已启用 / 待命）→ 勾选「显示切换提示条」（总开关，关掉后切到目标 App 不再弹提示）→ 勾选「切走时也提示」→「预览提示条」→「使用说明」→ 退出
+  两个开关都会记住，重启后保持上次的选择
 - **已运行时再双击**：只弹提示，不会起第二个实例
 
 ### 命令行
@@ -116,6 +117,7 @@ make install
 build/pagekey com.microsoft.rdc.macos        # 指定目标 App
 build/pagekey com.apple.Terminal com.foo.bar  # 多个 App 共用同一套映射
 build/pagekey com.microsoft.rdc.macos --quiet # 静默启动（不弹说明框，适合登录项）
+build/pagekey com.microsoft.rdc.macos --no-hud # 不弹切换提示条
 build/pagekey --list                          # 查当前前台 App 的 bundle id
 build/pagekey --reset                         # 清空全局映射，恢复正常
 build/pagekey --version
@@ -125,6 +127,7 @@ build/pagekey --version
 | --- | --- |
 | `bundle-id ...` | 目标 App，可多个；省略时默认 `com.microsoft.rdc.macos`（Windows App） |
 | `--quiet` | 静默启动，不弹启动说明 |
+| `--no-hud` | 不显示切换提示条（等价于关掉菜单里的「显示切换提示条」） |
 | `--reset` | 清除全局键位映射 |
 | `--list` | 打印当前前台 App 及其 bundle id |
 | `--version` / `-h` | 版本 / 帮助 |

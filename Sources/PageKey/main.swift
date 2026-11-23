@@ -11,7 +11,7 @@
 // 构建：make build（或 swiftc -O Sources/PageKey/main.swift -o build/pagekey）
 // 许可：MIT
 
-let PageKeyVersion = "1.0.0"
+let PageKeyVersion = "1.1.0"
 
 import Cocoa
 
@@ -106,7 +106,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem!
     var hud = HUD()
     var hudFade: DispatchWorkItem?
-    var notifyOnLeave = false
+    // 菜单里的两个开关，持久化到 UserDefaults
+    var hudEnabled: Bool = (UserDefaults.standard.object(forKey: "hudEnabled") as? Bool) ?? true
+    var notifyOnLeave: Bool = UserDefaults.standard.bool(forKey: "notifyOnLeave")
     var targetFrontmost = false
     var applied = false
     let queue = DispatchQueue(label: "pagekey.hidutil", qos: .userInitiated)
@@ -136,6 +138,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // 稍后同步一次真实前台状态
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { self.syncWithFrontmost() }
         refreshMenu()
+
+        // 调试用：打印菜单结构后退出（CI 冒烟测试也用它）
+        if cliArgs.contains("--dump-menu") {
+            for item in statusItem.menu?.items ?? [] {
+                if item.isSeparatorItem { print("---"); continue }
+                let mark = item.state == .on ? "[x]" : "[ ]"
+                print("\(mark) \(item.title)\(item.isEnabled ? "" : "   (置灰)")")
+            }
+            exit(0)
+        }
+
         if !quietMode {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { self.showInfoAlert(first: true) }
         }
@@ -248,23 +261,46 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         scope.isEnabled = false
         statusItem.menu?.addItem(scope)
         statusItem.menu?.addItem(.separator())
+        let hudToggle = NSMenuItem(title: "显示切换提示条",
+                                   action: #selector(toggleHUD), keyEquivalent: "h")
+        hudToggle.state = hudEnabled ? .on : .off
+        statusItem.menu?.addItem(hudToggle)
+
         let toggle = NSMenuItem(title: "切走时也提示",
                                 action: #selector(toggleLeaveNotice), keyEquivalent: "")
-        toggle.state = notifyOnLeave ? .on : .off
+        toggle.state = (hudEnabled && notifyOnLeave) ? .on : .off
+        toggle.isEnabled = hudEnabled          // 总开关关掉时，子选项置灰
         statusItem.menu?.addItem(toggle)
-        statusItem.menu?.addItem(NSMenuItem(title: "显示提示条", action: #selector(testHUD), keyEquivalent: "t"))
+
+        statusItem.menu?.addItem(NSMenuItem(title: "预览提示条", action: #selector(testHUD), keyEquivalent: "t"))
         statusItem.menu?.addItem(NSMenuItem(title: "使用说明", action: #selector(showHelp), keyEquivalent: ""))
         statusItem.menu?.addItem(.separator())
         statusItem.menu?.addItem(NSMenuItem(title: "退出 PageKey", action: #selector(quit), keyEquivalent: "q"))
         for item in statusItem.menu?.items ?? [] { item.target = self }
     }
 
-    @objc func toggleLeaveNotice() { notifyOnLeave.toggle(); refreshMenu() }
-    @objc func testHUD() { showHUD("PageKey 提示条测试\n右 ⌘ = Page Up     右 ⌥ = Page Down") }
+    @objc func toggleHUD() {
+        hudEnabled.toggle()
+        UserDefaults.standard.set(hudEnabled, forKey: "hudEnabled")
+        if !hudEnabled { hud.hide() }
+        refreshMenu()
+    }
+
+    @objc func toggleLeaveNotice() {
+        notifyOnLeave.toggle()
+        UserDefaults.standard.set(notifyOnLeave, forKey: "notifyOnLeave")
+        refreshMenu()
+    }
+
+    @objc func testHUD() {
+        let note = hudEnabled ? "" : "\n（总开关当前为关闭状态）"
+        showHUD("PageKey 提示条测试\n右 ⌘ = Page Up     右 ⌥ = Page Down" + note, force: true)
+    }
     @objc func showHelp() { showInfoAlert(first: false) }
     @objc func quit() { NSApp.terminate(nil) }
 
-    func showHUD(_ text: String) {
+    func showHUD(_ text: String, force: Bool = false) {
+        guard hudEnabled || force else { return }
         hudFade?.cancel()
         hud.show(text: text)
         let work = DispatchWorkItem { self.hud.hide() }
@@ -284,6 +320,8 @@ PageKey \(PageKeyVersion) — 只在指定 App 前台时把右侧修饰键变成
 
 选项:
   --quiet     静默启动（不弹说明框，适合加登录项）
+  --no-hud    不显示切换提示条（等价于菜单里关掉「显示切换提示条」）
+  --no-hud    不显示切换提示条（等价于菜单里关掉「显示切换提示条」）
   --reset     清除全局键位映射，恢复正常
   --list      打印当前前台 App 的 bundle id（用来查目标 id）
   --version   版本号
@@ -335,6 +373,8 @@ let quietMode = cliArgs.contains("--quiet")
 let delegate = AppDelegate()
 let ids = cliArgs.filter { !$0.hasPrefix("--") }
 if !ids.isEmpty { delegate.targetIDs = Set(ids) }
+if cliArgs.contains("--no-hud") { delegate.hudEnabled = false }
+if cliArgs.contains("--no-hud") { delegate.hudEnabled = false }
 app.delegate = delegate
 app.setActivationPolicy(.accessory)
 app.run()
