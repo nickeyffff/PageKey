@@ -23,12 +23,12 @@ jobs:
 
       - name: 冒烟测试
         run: |
-          ./build/pagekey --version
-          ./build/pagekey --help
+          .build/pagekey --version
+          .build/pagekey --help
 
       - name: 上传产物
         uses: actions/upload-artifact@v4
         with:
           name: PageKey.app
-          path: build/PageKey.app
+          path: .build/PageKey.app
           if-no-files-found: error
