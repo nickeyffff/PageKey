@@ -7,6 +7,7 @@
 ![platform](https://img.shields.io/badge/macOS-12%2B-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![deps](https://img.shields.io/badge/dependencies-none-brightgreen)
+![release](https://img.shields.io/github/v/release/nickeyffff/PageKey)
 
 ---
 
@@ -64,13 +65,41 @@ xcode-select --install   # 若尚未安装
 
 ## 安装
 
+### 方式一：一键脚本（推荐）
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/nickeyffff/PageKey/main/install.sh | bash
+```
+
+下载最新发布包 → 解压 → 装到 `~/Applications` → **移除 quarantine 隔离属性** → 本地重新签名。
+全程不改系统设置、不装后台服务，装完双击即可用。
+
+### 方式二：手动下载安装包
+
+从 [Releases](https://github.com/nickeyffff/PageKey/releases) 下载 `PageKey.dmg`（或 `PageKey.app.zip`），
+把 `PageKey.app` 拖进「应用程序」。
+
+### 方式三：源码编译
+
 ```bash
 git clone https://github.com/nickeyffff/PageKey.git
 cd PageKey
-make install      # 编译 → 打包 PageKey.app → 安装到 ~/Applications
+make install
 ```
 
-然后双击 `~/Applications/PageKey.app`。首次启动会弹一个说明框（不用点任何授权），点「知道了」即可。菜单栏会出现 ⌨ 图标。
+本机编译出的产物不带 quarantine 标记，**永远不会被 Gatekeeper 拦**，只是需要装 Xcode Command Line Tools。
+
+### 关于「自己打包的应用下载后打不开」
+
+这是 macOS 的 Gatekeeper 机制，不是程序坏了。诚实地列清楚：
+
+| 现象 | 真正原因 | 解决 |
+| --- | --- | --- |
+| 「已损坏，无法打开，应移到废纸篓」 | 从网络下载的 app 带 `com.apple.quarantine` 扩展属性，且没有 Apple 公证签名 | 用**方式一**；或终端 `xattr -dr com.apple.quarantine /Applications/PageKey.app` |
+| 「无法验证开发者」 | 同上（未公证） | 右键点 app → 打开 → 再点「打开」；或到「系统设置 → 隐私与安全性」底部点「仍要打开」 |
+| 双击毫无反应 | 可执行文件签名失效 | 用方式一（会本地重签）；或 `codesign --force --sign - /Applications/PageKey.app` |
+
+**为什么不做公证**：走 Apple 公证需要 Developer ID 证书（Developer Program，99 美元/年）并把产物送 Apple 服务器扫描。对一个几百行的键位小工具来说不值当，所以选择：**下载版首次打开手动放行一次，或用一键脚本自动处理**。
 
 ## 使用
 
