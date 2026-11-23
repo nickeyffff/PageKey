@@ -151,10 +151,20 @@ make clean
 
 ```
 PageKey/
-├── Sources/PageKey/main.swift   # 全部逻辑（约 330 行，单文件）
-├── Resources/Info.plist         # app bundle 元信息
+├── Sources/PageKey/main.swift    # 全部逻辑（约 330 行，单文件）
+├── Resources/
+│   ├── Info.plist                # app bundle 元信息
+│   └── AppIcon.icns              # 图标（由 Scripts/make_icon.swift 生成）
+├── Scripts/make_icon.swift       # 用 Core Graphics 画图标，改配色后重新生成即可
 ├── Makefile
-└── .github/workflows/build.yml  # CI：编译 + 产物上传
+└── .github/workflows/build.yml   # CI：编译 + 产物上传
+```
+
+重新生成图标：
+
+```bash
+swiftc -O Scripts/make_icon.swift -o /tmp/mkicon && /tmp/mkicon /tmp/icon.png
+# 再按 16/32/64/128/256/512(+@2x) 导出 iconset，iconutil -c icns 打包
 ```
 
 代码结构：`HUD`（浮动提示条）→ `AppDelegate`（前台监听、hidutil 调用、菜单栏、弹窗）→ 入口（参数解析、单实例保护）。
