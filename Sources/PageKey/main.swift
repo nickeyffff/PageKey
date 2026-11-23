@@ -4,14 +4,16 @@
 // 在目标 App 激活 / 失活时，用系统自带的 /usr/bin/hidutil 在 HID 层
 // 应用或撤销键盘映射。切换瞬时生效，其他 App 里按键保持原样。
 //
-//   双击启动      → 弹窗说明（菜单栏出现 ⌨ 图标）
+//   双击启动      → 静默常驻，菜单栏出现 ⌨ 图标（不弹任何窗口）
 //   切到目标 App  → 应用映射 + 右上角提示条
 //   切走          → 撤销映射，按键恢复原功能
+
+//   菜单「使用说明」或再次双击图标 → 才弹说明
 //
 // 构建：make build（或 swiftc -O Sources/PageKey/main.swift -o build/pagekey）
 // 许可：MIT
 
-let PageKeyVersion = "1.1.0"
+let PageKeyVersion = "1.1.1"
 
 import Cocoa
 
@@ -149,9 +151,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             exit(0)
         }
 
-        if !quietMode {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { self.showInfoAlert(first: true) }
-        }
     }
 
     func syncWithFrontmost() {
@@ -204,7 +203,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func showInfoAlert(first: Bool) {
         NSApp.activate(ignoringOtherApps: true)
         let a = NSAlert()
-        a.messageText = first ? "PageKey 已启动（无需任何权限）" : "PageKey 已在后台运行"
+        a.messageText = first ? "PageKey 使用说明" : "PageKey 已在后台运行"
         a.informativeText = """
         生效范围：\(targetIDs.sorted().joined(separator: "、"))
         该 App 在前台时：
@@ -319,7 +318,7 @@ PageKey \(PageKeyVersion) — 只在指定 App 前台时把右侧修饰键变成
   PageKey [bundle-id ...] [选项]
 
 选项:
-  --quiet     静默启动（不弹说明框，适合加登录项）
+  --quiet     兼容保留（启动已默认静默，无需此参数）
   --no-hud    不显示切换提示条（等价于菜单里关掉「显示切换提示条」）
   --no-hud    不显示切换提示条（等价于菜单里关掉「显示切换提示条」）
   --reset     清除全局键位映射，恢复正常
@@ -369,7 +368,6 @@ if cliArgs.contains("--reset") {
     exit(0)
 }
 
-let quietMode = cliArgs.contains("--quiet")
 let delegate = AppDelegate()
 let ids = cliArgs.filter { !$0.hasPrefix("--") }
 if !ids.isEmpty { delegate.targetIDs = Set(ids) }
