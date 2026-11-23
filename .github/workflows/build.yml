@@ -1,0 +1,34 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 查看 Swift 版本
+        run: swiftc --version
+
+      - name: 编译
+        run: make build
+
+      - name: 打包 .app
+        run: make app
+
+      - name: 冒烟测试
+        run: |
+          ./build/pagekey --version
+          ./build/pagekey --help
+
+      - name: 上传产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: PageKey.app
+          path: build/PageKey.app
+          if-no-files-found: error

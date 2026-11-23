@@ -1,0 +1,13 @@
+# 构建产物
+.build/
+build/
+*.app
+
+# macOS
+.DS_Store
+._*
+
+# Xcode（本项目用 Makefile，如临时生成则忽略）
+*.xcodeproj
+xcuserdata/
+DerivedData/
