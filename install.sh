@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # PageKey 一键安装脚本
 #
-#   curl -fsSL https://raw.githubusercontent.com/nickeyffff/PageKey/main/install.sh | bash
+#   curl -fsSL https://github.com/nickeyffff/PageKey/releases/latest/download/install.sh | bash
 #
 # 做四件事：下载最新 Release → 解压 → 安装到 ~/Applications → 去掉隔离属性
 # 不会改动系统设置，不会写入任何后台服务。

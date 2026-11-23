@@ -68,7 +68,7 @@ xcode-select --install   # 若尚未安装
 ### 方式一：一键脚本（推荐）
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nickeyffff/PageKey/main/install.sh | bash
+curl -fsSL https://github.com/nickeyffff/PageKey/releases/latest/download/install.sh | bash
 ```
 
 下载最新发布包 → 解压 → 装到 `~/Applications` → **移除 quarantine 隔离属性** → 本地重新签名。

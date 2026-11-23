@@ -42,7 +42,7 @@ jobs:
           **方式一（推荐，自动处理 Gatekeeper 隔离属性）**
 
           ```bash
-          curl -fsSL https://raw.githubusercontent.com/nickeyffff/PageKey/main/install.sh | bash
+          curl -fsSL https://github.com/nickeyffff/PageKey/releases/latest/download/install.sh | bash
           ```
 
           **方式二**：下载 `PageKey.app.zip` 或 `PageKey.dmg`，解压 / 挂载后把 PageKey.app 拖进「应用程序」。
