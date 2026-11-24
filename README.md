@@ -2,7 +2,7 @@
 
 **只在指定 App 前台时，把 macOS 右侧的 Command / Option 临时变成 Page Up / Page Down。切走立刻恢复原样。**
 
-零权限、零内核扩展、零第三方依赖。为「在远程桌面里翻页」这种小事而生。
+零权限、零内核扩展、零第三方依赖。原本只是为了让「用 Mac 远程连 Windows 看股票」这件事顺手一点。
 
 ![platform](https://img.shields.io/badge/macOS-12%2B-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
@@ -11,11 +11,17 @@
 
 ---
 
-## 这个工具解决什么
+## 起因
 
-在 Windows App（原 Microsoft Remote Desktop）里连远程 Windows 时，右侧的 Command / Option 基本用不上，而 Page Up / Page Down 又天天要用 —— 但 macOS 上遥控器的翻页键在笔记本键盘上得按 `Fn + ↑/↓`，很难受。
+我每天用 **Windows App**（原 Microsoft Remote Desktop）从 Mac 远程连一台 Windows 机器看股票。
 
-于是：**只在那个 App 里**，把两个闲置的右侧修饰键改成翻页键；一离开该 App，它们立刻恢复成正常的 Command / Option。
+行情页面需要不停地上下翻页，但这台 MacBook 没有独立的 Page Up / Page Down 键 —— 每次都得按 `Fn + ↑/↓`，两只手一起上，一天下来又累又慢。
+
+低头一看键盘右下角：**右边的 Command 和 Option 在远程桌面里几乎从来用不到**，位置又刚好在方向键上方，手指不用移动。
+
+于是有了这个工具：**只在 Windows App 位于前台时**，把这两个闲置的修饰键换成翻页键；一旦切走，立刻恢复成正常的 Command / Option，不影响任何系统快捷键。
+
+它不是通用改键软件，只解决这一个小麻烦 —— 顺便，任何「某个 App 里需要另外一套键位」的场景也能用。
 
 ## 效果
 
@@ -31,7 +37,7 @@
 | 方案 | 问题 |
 | --- | --- |
 | 系统设置 → 修饰键 | 只能「修饰键 ↔ 修饰键」，映射不到 Page Up / Page Down |
-| Karabiner-Elements | 功能强大，但为两个键装驱动 + 系统扩展，且不能真正按 App 隔离到「非修饰键映射」以外的场景也够重 |
+| Karabiner-Elements | 功能最全、也能按 App 生效，但要装内核扩展 / 虚拟 HID 驱动，为两个翻页键来说太重 |
 | CGEventTap 自研拦截 | 需要「辅助功能」授权；自签名程序的授权记录与二进制哈希绑定，每次重新编译都可能失效 |
 | **PageKey（本项目）** | 用系统自带的 `hidutil` 在 App 切换瞬间改写 HID 映射，**完全不需要任何权限** |
 
